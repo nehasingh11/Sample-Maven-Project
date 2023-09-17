@@ -1,15 +1,11 @@
-pipeline {
-    agent any 
-    stages 
-  {
-    stage('maven install') 
-    {
-      steps {
-        withMaven(globalMavenSettingsConfig: '', jdk: '', maven: 'maven3', mavenSettingsConfig: '', traceability: true) 
-        {
-            sh 'mvn clean install'
-        }
-      }
+node {
+  stage('SCM') {
+    checkout scm
+  }
+  stage('SonarQube Analysis') {
+    def mvn = tool 'Default Maven';
+    withSonarQubeEnv() {
+      sh "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=sonar-test -Dsonar.projectName='sonar-test'"
     }
   }
 }
